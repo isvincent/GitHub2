@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub 資源導覽</title>
+    <style>
+        /* 色彩設定 - 明亮且色彩豐富 */
+        :root {
+            --primary: #FF7675;     /* 活潑紅 */
+            --secondary: #74B9FF;   /* 天空藍 */
+            --accent: #FDCB6E;      /* 暖黃色 */
+            --green: #55E6C1;       /* 薄荷綠 */
+            --background: #F8F9FA;
+            --text-dark: #2D3436;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, '微軟正黑體';
+            background-color: var(--background);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            /* 字體放大，方便學生閱讀 */
+            font-size: 1.15rem; 
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            /* 使用漸層色彩代替外部圖片 */
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8em;
+            text-shadow: 2px 3px 5px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        #searchInput {
+            width: 85%;
+            max-width: 700px;
+            padding: 20px 30px;
+            font-size: 1.3em;
+            border: 4px solid var(--secondary);
+            border-radius: 40px;
+            outline: none;
+            box-shadow: 0 8px 20px rgba(116, 185, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(255, 118, 117, 0.3);
+            transform: scale(1.02);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-left: 10px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 給卡片不同的左側邊框顏色 */
+        .card:nth-child(4n+1) { border-left-color: var(--primary); }
+        .card:nth-child(4n+2) { border-left-color: var(--secondary); }
+        .card:nth-child(4n+3) { border-left-color: var(--green); }
+        .card:nth-child(4n+4) { border-left-color: var(--accent); }
+
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 18px 35px rgba(0,0,0,0.12);
+            /* hover 時帶有一點極淡的黃色背景 */
+            background-color: #FFFAEA;
+        }
+
+        .card-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: var(--text-dark);
+        }
+
+        .card-url {
+            font-size: 1em;
+            color: #636E72;
+            word-break: break-all;
+            background: #F1F2F6;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: monospace;
+        }
+
+        .status-msg {
+            text-align: center;
+            font-size: 1.8em;
+            padding: 60px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        
+        .error {
+            color: #D63031;
+            border-left: 10px solid #D63031;
+        }
+
+        /* 點擊特效 */
+        .ripple {
+            position: absolute;
+            background: rgba(0,0,0,0.1);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* 響應式 */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.2em; }
+            #searchInput { font-size: 1.1em; width: 90%; }
+            .card-title { font-size: 1.4em; }
+            body { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 GitHub 資源探索網 🌟</h1>
+            <p>輕鬆尋找並點擊你需要的學習資源</p>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="🔍 輸入關鍵字尋找資源..." aria-label="搜尋資源">
+        </div>
+
+        <div id="loading" class="status-msg">正在載入 CSV 資料，請稍候... ⏳</div>
+        <div id="errorMsg" class="status-msg error" style="display: none;"></div>
+
+        <div id="linkGrid" class="grid-container">
+            <!-- 資源卡片將會在這裡動態產生 -->
+        </div>
+    </div>
+
+    <script>
+        // 設定要讀取的 CSV 檔案名稱
+        const CSV_FILE_URL = 'GitHub網址與內容.csv';
+        let allLinks = [];
+
+        // 🎵 音效系統 (使用 Web Audio API，不需要外部音檔)
+        // 解決瀏覽器需要使用者互動才能播放聲音的限制
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            const now = audioCtx.currentTime;
+            
+            if (type === 'hover') {
+                // 短促輕快的木琴聲感覺
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, now);
+                oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                gainNode.gain.setValueAtTime(0.02, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                oscillator.start(now);
+                oscillator.stop(now + 0.05);
+            } else if (type === 'click') {
+                // 清脆的點擊聲
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(400, now);
+                oscillator.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                gainNode.gain.setValueAtTime(0.08, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.15);
+                oscillator.start(now);
+                oscillator.stop(now + 0.15);
+            }
+        }
+
+        // 解析 CSV 格式的函式 (支援引號包覆與換行)
+        function parseCSV(text) {
+            let rows = [];
+            let row = [];
+            let inQuotes = false;
+            let val = "";
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                if (inQuotes) {
+                    if (char === '"' && text[i + 1] === '"') {
+                        val += '"';
+                        i++; // 跳過下一個引號
+                    } else if (char === '"') {
+                        inQuotes = false;
+                    } else {
+                        val += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        row.push(val);
+                        val = "";
+                    } else if (char === '\n' || char === '\r') {
+                        if (char === '\r' && text[i + 1] === '\n') i++; // 處理 Windows CRLF
+                        row.push(val);
+                        rows.push(row);
+                        row = [];
+                        val = "";
+                    } else {
+                        val += char;
+                    }
+                }
+            }
+            if (val || row.length > 0) {
+                row.push(val);
+                rows.push(row);
+            }
+            return rows;
+        }
+
+        // 初始化與讀取檔案
+        async function init() {
+            try {
+                // 嘗試抓取同目錄下的 CSV 檔案
+                const response = await fetch(CSV_FILE_URL);
+                if (!response.ok) {
+                    throw new Error(`無法讀取 ${CSV_FILE_URL} (${response.status})。<br><br>💡 提示：請確認您的資料夾中有將 Excel 另存為 <b>${CSV_FILE_URL}</b>。<br>另外，因為瀏覽器的安全限制，如果您是直接點兩下開啟 HTML (網址列顯示 file://)，將無法讀取本地端的 CSV 檔。<br>請將此網頁與 CSV 檔一起上傳到 GitHub Pages，即可正常運作！`);
+                }
+                
+                // 取得純文字內容 (假設為 UTF-8 編碼)
+                const textData = await response.text();
+                
+                // 轉為 2D 陣列
+                const jsonData = parseCSV(textData);
+                
+                parseExcelData(jsonData);
+                renderCards(allLinks);
+                
+                document.getElementById('loading').style.display = 'none';
+                
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading').style.display = 'none';
+                const errorDiv = document.getElementById('errorMsg');
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = `⚠️ 哎呀，發生錯誤了：<br>${error.message}`;
+            }
+        }
+
+        // 轉換陣列資料為我們需要的物件
+        function parseExcelData(data) {
+            allLinks = [];
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                // 確保列有足夠的長度 (C欄為 row[2], D欄為 row[3])
+                if (row && row.length >= 4) {
+                    const name = String(row[2]).trim(); // C 欄
+                    const url = String(row[3]).trim();  // D 欄
+                    
+                    // 檢查是不是標題列 (簡單排除)
+                    if (i === 0 && (name.includes('名') || url.includes('網址') || url.includes('URL'))) {
+                        continue; 
+                    }
+
+                    // 確保內容不是空的，且網址有一些基本的長相
+                    if (name && url && url.length > 5) {
+                        allLinks.push({ name, url });
+                    }
+                }
+            }
+        }
+
+        // 渲染卡片畫面
+        function renderCards(links) {
+            const grid = document.getElementById('linkGrid');
+            grid.innerHTML = '';
+            
+            if (links.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 1.5em; color: #636E72;">🔍 找不到相符的資源</div>';
+                return;
+            }
+
+            links.forEach(link => {
+                const card = document.createElement('a');
+                card.href = link.url;
+                card.target = "_blank"; // 在新分頁開啟
+                card.rel = "noopener noreferrer"; // 安全性設定
+                card.className = 'card';
+                
+                card.innerHTML = `
+                    <div class="card-title">${escapeHTML(link.name)}</div>
+                    <div class="card-url">${escapeHTML(link.url)}</div>
+                `;
+
+                // 綁定音效與視覺互動
+                card.addEventListener('mouseenter', () => playSound('hover'));
+                
+                card.addEventListener('click', function(e) {
+                    playSound('click');
+                    
+                    // 產生波紋特效
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = `${size}px`;
+                    ripple.style.marginLeft = ripple.style.marginTop = `${-size/2}px`;
+                    
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        // 搜尋列事件監聽
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase().trim();
+            const filtered = allLinks.filter(link => 
+                link.name.toLowerCase().includes(keyword) || 
+                link.url.toLowerCase().includes(keyword)
+            );
+            renderCards(filtered);
+        });
+
+        // 防止 XSS 攻擊的簡單過濾
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        // 使用者第一次互動時初始化音訊 (解決瀏覽器自動播放限制)
+        document.body.addEventListener('mousemove', initAudio, { once: true });
+        document.body.addEventListener('touchstart', initAudio, { once: true });
+
+        // 網頁載入完成後執行
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
